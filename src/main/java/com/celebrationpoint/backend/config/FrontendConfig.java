@@ -30,7 +30,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class FrontendConfig {
 
-    @Value("${frontend.url:https://celebrationpointdevtestforclient.netlify.app}")
+    @Value("${frontend.url:http://localhost:5173}")
     private String frontendUrl;
 
     /**
