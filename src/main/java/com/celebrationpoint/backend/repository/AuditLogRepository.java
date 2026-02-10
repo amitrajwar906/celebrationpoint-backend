@@ -16,4 +16,7 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, Long> {
     );
 
     Page<AuditLog> findByPerformedBy(String performedBy, Pageable pageable);
+    
+    // ✅ Delete audit logs by user email
+    void deleteByPerformedBy(String email);
 }

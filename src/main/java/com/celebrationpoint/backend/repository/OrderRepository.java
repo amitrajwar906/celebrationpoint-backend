@@ -10,4 +10,10 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
 
     // ✅ Get all orders of a user (order history)
     List<Order> findByUserOrderByCreatedAtDesc(User user);
+    
+    // ✅ Find all orders by user (for deletion)
+    List<Order> findByUser(User user);
+    
+    // ✅ Delete all orders by user
+    void deleteByUser(User user);
 }

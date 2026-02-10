@@ -41,8 +41,21 @@ public class CartService {
     // 🧠 CORE: GET OR CREATE CART
     // ===============================
     private Cart getOrCreateCart(User user) {
-        return cartRepository.findByUser(user)
-                .orElseGet(() -> cartRepository.save(new Cart(user)));
+        try {
+            // First try to find existing cart
+            var existingCart = cartRepository.findByUser(user);
+            if (existingCart.isPresent()) {
+                return existingCart.get();
+            }
+            
+            // If cart doesn't exist, create new one
+            Cart newCart = new Cart(user);
+            return cartRepository.save(newCart);
+        } catch (Exception e) {
+            // If creation fails, try to find the cart again (might have been created by another thread)
+            return cartRepository.findByUser(user)
+                    .orElse(null);
+        }
     }
 
     // ===============================
@@ -61,6 +74,10 @@ public class CartService {
                 .orElseThrow(() -> new ResourceNotFoundException("Product not found"));
 
         Cart cart = getOrCreateCart(user);
+        
+        if (cart == null) {
+            throw new RuntimeException("Failed to create or retrieve cart for user: " + email);
+        }
 
         CartItem cartItem = cartItemRepository
                 .findByCartAndProduct(cart, product)
@@ -89,7 +106,14 @@ public class CartService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
-        Cart cart = getOrCreateCart(user);
+        // Don't auto-create cart on view - just return items from existing cart
+        // Use Optional to avoid creating cart automatically
+        Cart cart = cartRepository.findByUser(user).orElse(null);
+        
+        if (cart == null) {
+            // Return empty list if no cart exists yet
+            return List.of();
+        }
 
         return cartItemRepository.findByCart(cart).stream()
                 .map(item -> new CartItemResponse(

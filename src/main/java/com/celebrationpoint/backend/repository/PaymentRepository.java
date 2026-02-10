@@ -14,6 +14,10 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
 
     // ✅ Get payment by order
     Optional<Payment> findByOrder(Order order);
+    
+    // ✅ Delete payment by order
+    void deleteByOrder(Order order);
+    
     @Query("""
         SELECT COALESCE(SUM(p.amount), 0)
         FROM Payment p
