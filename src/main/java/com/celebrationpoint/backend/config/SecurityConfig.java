@@ -61,13 +61,12 @@ public class SecurityConfig {
         return configuration.getAuthenticationManager();
     }
 
-    // 🌐 CORS CONFIG (Uses centralized FrontendConfig)
+    // 🌐 CORS CONFIG (Uses centralized FrontendConfig - supports multiple URLs)
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();
 
-        config.setAllowedOrigins(List.of(
-                frontendConfig.getUrl()));
+        config.setAllowedOrigins(frontendConfig.getUrls());
         config.setAllowedMethods(List.of(
                 "GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         config.setAllowedHeaders(List.of(
