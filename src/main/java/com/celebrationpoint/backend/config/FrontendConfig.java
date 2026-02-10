@@ -20,35 +20,45 @@ import org.springframework.stereotype.Component;
  *   String url = frontendConfig.getUrl();
  * 
  * CONFIGURATION:
- * - Local Dev: Set FRONTEND_URL env var to http://localhost:5173
- * - Netlify: Set FRONTEND_URL env var to your Netlify domain
- * - Railway: Set FRONTEND_URL env var to your Railway domain
+ * - Local Dev: Set FRONTEND_URLS env var to http://localhost:5173
+ * - Multiple URLs: Set FRONTEND_URLS env var to comma-separated URLs (e.g., https://url1.com,https://url2.com)
  * 
  * DEFAULT FALLBACK:
- * If FRONTEND_URL env var is not set, defaults to http://localhost:5173
+ * If FRONTEND_URLS env var is not set, defaults to http://localhost:5173
  */
 @Component
 public class FrontendConfig {
 
-    @Value("${frontend.url:http://localhost:5173}")
-    private String frontendUrl;
+    @Value("${frontend.urls:http://localhost:5173}")
+    private String frontendUrls;
 
     /**
-     * Get the configured frontend URL
+     * Get the list of configured frontend URLs
      * 
-     * @return Frontend URL (e.g., http://localhost:5173 or https://example.netlify.app)
+     * @return List of Frontend URLs (e.g., [http://localhost:5173, https://example.netlify.app])
+     */
+    public java.util.List<String> getUrls() {
+        return java.util.Arrays.stream(frontendUrls.split(","))
+                .map(String::trim)
+                .collect(java.util.stream.Collectors.toList());
+    }
+
+    /**
+     * Get the primary (first) configured frontend URL
+     * 
+     * @return Primary Frontend URL (e.g., http://localhost:5173)
      */
     public String getUrl() {
-        return frontendUrl;
+        return getUrls().get(0);
     }
 
     /**
      * Get the frontend callback URL for payment gateways
      * 
      * @param path The callback path (e.g., /paytm-callback)
-     * @return Full callback URL (e.g., http://localhost:5173/paytm-callback)
+     * @return Full callback URL using the primary URL (e.g., http://localhost:5173/paytm-callback)
      */
     public String getCallbackUrl(String path) {
-        return frontendUrl + path;
+        return getUrl() + path;
     }
 }

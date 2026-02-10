@@ -24,8 +24,8 @@ public class CorsConfig {
         CorsConfiguration config = new CorsConfiguration();
 
         config.setAllowCredentials(true);
-        // Use centralized frontend URL from FrontendConfig
-        config.setAllowedOrigins(List.of(frontendConfig.getUrl()));
+        // Use all configured frontend URLs from FrontendConfig
+        config.setAllowedOrigins(frontendConfig.getUrls());
         config.setAllowedHeaders(List.of("*"));
         config.setAllowedMethods(List.of(
                 "GET",
